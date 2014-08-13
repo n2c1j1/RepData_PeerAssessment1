@@ -26,12 +26,12 @@ steps_per_day <- ddply(activity, .(date), summarise, sum=sum(steps))
 hist(steps_per_day$sum,main="Steps per Day",col="green",xlab= "Number of Steps")
 ```
 
-Mean total number of steps per day:
+### Mean total number of steps per day:
 ```{r}
 mean(steps_per_day$sum,na.rm=TRUE)
 ```
 
-Median total number of steps per day:
+### Median total number of steps per day:
 ```{r}
 median(steps_per_day$sum,na.rm=TRUE)
 ```
@@ -47,14 +47,23 @@ axis(1,labels=c("6am","12noon","6pm","12midnight"),
        at=c(72,144,216,288))
 ```
 
+### Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+
+The rightmost two digits correspond to the minutes.
+The leftmost digit(s) corresponds to the hour (24 hour clock).
+```{r}
+max_steps_set <- subset(steps_per_interval,mean == max(steps_per_interval$mean))
+max_steps_set$interval
+```
+
 
 ## Imputing missing values
 
-Calculate the number of 5-minute intervals with a missing value(NA)
+### Calculate the number of 5-minute intervals with a missing value(NA)
 ```{r}
 nrow(activity) - sum(complete.cases(activity$steps))
 ```
-Replace missing step count values with the average step count for that same time interval.
+### Replace missing step count values with the average step count for that same time interval.
 
 ```{r}
 # make a copy of the steps colum
@@ -71,7 +80,7 @@ for (i in 1:nrow(activity))
   }
 
 ```
-Recalculate the average steps per day to see how it compares with the raw data
+### Recalculate the average steps per day to see how it compares with the raw data
 ```{r}
 fixed_steps_per_day <- ddply(activity, .(date), summarise, sum=sum(steps))
 hist(fixed_steps_per_day$sum,main="Steps per Day (fixed data)",col="green",xlab= "Number of Steps")
@@ -79,12 +88,12 @@ hist(fixed_steps_per_day$sum,main="Steps per Day (fixed data)",col="green",xlab=
 The histogram of the corrected data lokks very much like the histogram of the raw data. The mean and median values of number of steps per day are identical to the values computed for the raw data.
 
 
-Mean total number of steps per day:
+### Mean total number of steps per day (fixed data):
 ```{r}
 mean(fixed_steps_per_day$sum,na.rm=TRUE)
 ```
 
-Median total number of steps per day:
+### Median total number of steps per day(fixed data):
 ```{r}
 median(fixed_steps_per_day$sum,na.rm=TRUE)
 ```
@@ -131,4 +140,4 @@ grid.arrange(p1,p2 ,nrow=2)
            
 ```
 
-This plot shows how the average activity level over the course of a 24 hour period differs between weekdays and weekends.
+### This plot shows how the average activity level over the course of a 24 hour period differs between weekdays and weekends.
