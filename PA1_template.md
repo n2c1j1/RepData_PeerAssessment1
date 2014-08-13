@@ -4,39 +4,59 @@
 
 Assume the data zipfile, named "activity.zip", is in the current working directory.
 
-```{r}
+
+```r
 # load in the necessary packages
 library(plyr)
 library(ggplot2)
 library(gridExtra)
+```
 
+```
+## Loading required package: grid
+```
+
+```r
 # Unzip the data file if that has not already been done
 if (!file.exists("activity.csv")) {
   unzip("activity.zip")
   }
 # read in the data
 activity <- read.csv("activity.csv",colClasses=c("integer","POSIXct","integer"))
-
 ```
 
 
 ## What is mean total number of steps taken per day?
-```{r}
+
+```r
 steps_per_day <- ddply(activity, .(date), summarise, sum=sum(steps))
 hist(steps_per_day$sum,main="Steps per Day",col="green",xlab= "Number of Steps")
 ```
 
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2.png) 
+
 Mean total number of steps per day:
-```{r}
+
+```r
 mean(steps_per_day$sum,na.rm=TRUE)
 ```
 
+```
+## [1] 10766
+```
+
 Median total number of steps per day:
-```{r}
+
+```r
 median(steps_per_day$sum,na.rm=TRUE)
 ```
+
+```
+## [1] 10765
+```
 ## What is the average daily activity pattern?
-```{r} 
+
+```r
 steps_per_interval <- ddply(activity, .(interval), summarise, 
                             mean=mean(steps,na.rm=TRUE))
 steps_per_interval$rownum <- c(1:nrow(steps_per_interval))
@@ -47,16 +67,24 @@ axis(1,labels=c("6am","12noon","6pm","12midnight"),
        at=c(72,144,216,288))
 ```
 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5.png) 
+
 
 ## Imputing missing values
 
 Calculate the number of 5-minute intervals with a missing value(NA)
-```{r}
+
+```r
 nrow(activity) - sum(complete.cases(activity$steps))
+```
+
+```
+## [1] 2304
 ```
 Replace missing step count values with the average step count for that same time interval.
 
-```{r}
+
+```r
 # make a copy of the steps colum
 activity$fixed_steps <- activity$steps
 for (i in 1:nrow(activity))
@@ -69,24 +97,36 @@ for (i in 1:nrow(activity))
     activity$fixed_steps[i] <-as.integer(steps_per_interval$mean[ind])
     }
   }
-
 ```
 Recalculate the average steps per day to see how it compares with the raw data
-```{r}
+
+```r
 fixed_steps_per_day <- ddply(activity, .(date), summarise, sum=sum(steps))
 hist(fixed_steps_per_day$sum,main="Steps per Day (fixed data)",col="green",xlab= "Number of Steps")
 ```
+
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8.png) 
 The histogram of the corrected data lokks very much like the histogram of the raw data. The mean and median values of number of steps per day are identical to the values computed for the raw data.
 
 
 Mean total number of steps per day:
-```{r}
+
+```r
 mean(fixed_steps_per_day$sum,na.rm=TRUE)
 ```
 
+```
+## [1] 10766
+```
+
 Median total number of steps per day:
-```{r}
+
+```r
 median(fixed_steps_per_day$sum,na.rm=TRUE)
+```
+
+```
+## [1] 10765
 ```
 
 
@@ -94,7 +134,8 @@ median(fixed_steps_per_day$sum,na.rm=TRUE)
 ## Are there differences in activity patterns between weekdays and weekends?
 
 
-```{r}
+
+```r
 # set up columns which indicate day of week and weekend/not
 activity$dayofweek <- weekdays(activity$date)
 activity$weekend <- (weekdays(as.Date(activity$date)) %in% c('Saturday','Sunday'))
@@ -128,7 +169,8 @@ p2 <- g2 + scale_x_continuous(labels=c("6am","12noon","6pm","12midnight"),
 
 # arrange the plots as two rows, 1 column                      
 grid.arrange(p1,p2 ,nrow=2)
-           
 ```
+
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11.png) 
 
 This plot shows how the average activity level over the course of a 24 hour period differs between weekdays and weekends.
